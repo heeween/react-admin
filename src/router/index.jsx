@@ -2,44 +2,46 @@
 import { Navigate } from "react-router-dom";
 import { Suspense, lazy } from "react";
 
-import * as mod from "../components/About/About.jsx";
 
-const aboutP = import('../components/About/About.jsx')
-console.log(aboutP.then((params) => {
-    console.log(params);
-    console.log(params === mod);
-}));
+const About = lazy(() => import('../components/About/About'))
+const Home = lazy(() => import('../components/Home/Home'))
+const Page = lazy(() => import('../components/Page/Page'))
 
-const About = lazy(() => import('../components/About/About.jsx')  )
-const Home = lazy(() => { import('../components/Home/Home.jsx') })
+const wrapComponentWithSuspense = (comp) => (
+    <Suspense fallback={<div>loading</div>}>
+        {comp}
+    </Suspense>
+)
 
 
 const routes = [
     {
         path: "/",
-        element: <Navigate to="/home" />
+        element: <Navigate to="/page" />
     },
     {
-        path: "/home",
-        element:
-            <Suspense fallback={<div>loading</div>}>
-                <div>home</div>
-            </Suspense>
+        path: "/",
+        element: <Home />,
+        children: [
+            {
+                path: "/page",
+                element: wrapComponentWithSuspense(<Page />)
+            },
+            {
+                path: "/about",
+                element: wrapComponentWithSuspense(<About />)
+            }
+        ]
 
-    },
-    {
-        path: "/about",
-        element: <Suspense fallback={<div>loading</div>}>
-            <About/>
-        </Suspense>
     }
+
 ]
 function delayForDemo(promise) {
     return new Promise(resolve => {
-      setTimeout(resolve, 2000);
+        setTimeout(resolve, 2000);
     }).then(() => promise);
-  }
-  
+}
+
 export default routes;
 
 
